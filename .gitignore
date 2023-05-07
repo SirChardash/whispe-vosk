@@ -1,1 +1,7 @@
 /.idea/
+config.json
+/dist/
+/build/
+
+# won't commit this for now, potentially should
+/*.spec

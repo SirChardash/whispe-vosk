@@ -1,0 +1,4 @@
+customtkinter~=5.1.3
+vosk~=0.3.45
+pvrecorder~=1.1.1
+pyinstaller
