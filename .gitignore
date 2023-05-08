@@ -2,6 +2,7 @@
 config.json
 /dist/
 /build/
+/model
 
 # won't commit this for now, potentially should
 /*.spec

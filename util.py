@@ -1,6 +1,6 @@
 import json
 
-from vosk import KaldiRecognizer, Model
+import vosk
 
 
 def get_result(final_result):
@@ -17,7 +17,7 @@ def get_whatever(final_result):
 
 
 def get_recognizer(path):
-    recognizer = KaldiRecognizer(Model(path), 16000)
+    recognizer = vosk.KaldiRecognizer(vosk.Model(path), 16000)
     recognizer.SetWords(1)
     recognizer.SetPartialWords(1)
 
