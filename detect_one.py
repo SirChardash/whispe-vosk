@@ -1,6 +1,6 @@
 import wave
 
-from util import get_result, get_recognizer
+from recognizer import get_result, get_recognizer
 
 wf = wave.open('/home/chardash/heh3.wav')
 rec = get_recognizer('/home/chardash/model')

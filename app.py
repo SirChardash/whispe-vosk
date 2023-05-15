@@ -19,7 +19,7 @@ app.title("my app")
 app.geometry("720x360")
 app.minsize(720, 360)
 state = State(words=[], word_index=-1, audio_input_index=0)
-rec = recognizer.Recognizer(0, lambda x: x)
+rec = recognizer.Recognizer(0, lambda x: x, lambda: print(), 1.0)
 
 # instantiate all components
 audio_input_combobox = customtkinter.CTkComboBox(app, values=PvRecorder.get_audio_devices())
@@ -59,7 +59,11 @@ def load_words():
 
 
 def check_word(recognized):
-    console_output.insert('end', recognized + '\n')
+    result = recognized.word \
+        if recognized.confidence > config.get(config.THRESHOLD_UNK) \
+        else '<UNK> ({0})'.format(recognized.word)
+    console_output.insert(END, result + '\n')
+    print(recognized)
     state.word_index = state.word_index + 1
     if state.word_index < len(state.words):
         word_to_pronounce_label.configure(require_redraw=True, text=state.words[state.word_index])
@@ -76,7 +80,9 @@ def start_test():
     rec.stop()
     state.word_index = 0
     word_to_pronounce_label.configure(require_redraw=True, text=state.words[state.word_index])
-    rec = recognizer.Recognizer(audio_input_index=state.audio_input_index, on_recognize=check_word)
+    rec = recognizer.Recognizer(audio_input_index=state.audio_input_index, on_recognize=check_word,
+                                on_ready=lambda: print('heh'),
+                                threshold_ignore=config.get(config.THRESHOLD_IGNORE))
     Thread(target=rec.start).start()
     console_output.delete('1.0', END)
 

@@ -16,9 +16,4 @@ def get_whatever(final_result):
     return '{0} ({1})'.format(entry['text'], entry['result'][0]['conf'] if 'result' in entry else 1.0)
 
 
-def get_recognizer(path):
-    recognizer = vosk.KaldiRecognizer(vosk.Model(path), 16000)
-    recognizer.SetWords(1)
-    recognizer.SetPartialWords(1)
 
-    return recognizer
