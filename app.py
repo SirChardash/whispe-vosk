@@ -1,4 +1,5 @@
 from datetime import datetime
+import random
 from threading import Thread
 from tkinter import filedialog, END
 import re
@@ -18,7 +19,7 @@ customtkinter.set_appearance_mode(config.get(config.THEME))
 # set global settings
 app = customtkinter.CTk()
 app.title("my app")
-app.geometry("720x360")
+app.geometry("720x480")
 app.minsize(720, 360)
 state = State(words=[], word_index=-1, audio_input_index=0, speech_test=SpeechTest(), filename='')
 rec = recognizer.Recognizer(0, lambda x: x, lambda: print(), 1.0)
@@ -30,6 +31,7 @@ open_button = customtkinter.CTkButton(app, text="Otvori")
 start_button = customtkinter.CTkButton(app, text="Zapocni")
 retry_word_button = customtkinter.CTkButton(app, text="Ponisti zadnje")
 stop_test_button = customtkinter.CTkButton(app, text="Prekini")
+shuffle_words_checkbox = customtkinter.CTkCheckBox(app, text="Nasumican poredak")
 word_to_pronounce_label = customtkinter.CTkLabel(app, text='', font=('Arial', 36))
 console_output = customtkinter.CTkTextbox(app, width=400)
 console_output.bind("<Key>", lambda e: "break")
@@ -45,6 +47,7 @@ open_button.grid(row=2, column=0, pady=5)
 start_button.grid(row=3, column=0, pady=5)
 retry_word_button.grid(row=4, column=0, pady=5)
 stop_test_button.grid(row=5, column=0, pady=5)
+shuffle_words_checkbox.grid(row=6, column=0, pady=5)
 word_to_pronounce_label.grid(row=0, column=1, pady=30)
 console_output.grid(row=1, column=1, rowspan=4)
 
@@ -105,6 +108,8 @@ def start_test():
         return
     global rec
     rec.stop()
+    if shuffle_words_checkbox.get():
+        random.shuffle(state.words)
     state.word_index = 0
     word_to_pronounce_label.configure(require_redraw=True, text=state.words[state.word_index])
     rec = recognizer.Recognizer(audio_input_index=state.audio_input_index, on_recognize=check_word,
