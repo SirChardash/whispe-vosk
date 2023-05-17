@@ -5,13 +5,15 @@ config_location = 'config.json'
 THEME = 'theme'
 THRESHOLD_UNK = 'threshold_unk'
 THRESHOLD_IGNORE = 'threshold_ignore'
+RESULT_SAVE_DIR = 'result_save_dir'
 
 config = dict()
 
 config_default = {
     THEME: 'light',
     THRESHOLD_UNK: 0.95,
-    THRESHOLD_IGNORE: 0.8
+    THRESHOLD_IGNORE: 0.8,
+    RESULT_SAVE_DIR: ''
 }
 
 

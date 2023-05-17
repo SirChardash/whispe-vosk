@@ -4,7 +4,7 @@ import struct
 import vosk
 from pvrecorder import PvRecorder
 
-from spoken_word import SpokenWord
+from utterance import Utterance
 
 
 def get_recognizer(path):
@@ -18,10 +18,11 @@ def get_recognizer(path):
 def get_result(final_result):
     final_result_json = json.loads(final_result)
     if 'result' not in final_result_json:
-        return SpokenWord(word='', confidence=1.0, full_text='')
+        return Utterance(word='', confidence=1.0, full_text='')
     best_match = max(final_result_json['result'], key=lambda x: x['conf'])
     print(final_result_json)
-    return SpokenWord(
+    return Utterance(
+        expected='',
         word=best_match['word'],
         confidence=best_match['conf'],
         full_text=final_result_json['text']

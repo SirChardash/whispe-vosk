@@ -1,6 +1,7 @@
-class SpokenWord:
+class Utterance:
 
-    def __init__(self, word, confidence, full_text):
+    def __init__(self, expected, word, confidence, full_text):
+        self.expected = expected
         self.word = word
         self.confidence = confidence
         self.full_text = full_text

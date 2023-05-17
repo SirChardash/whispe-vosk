@@ -1,3 +1,4 @@
+from datetime import datetime
 from threading import Thread
 from tkinter import filedialog, END
 import re
@@ -6,6 +7,7 @@ import customtkinter
 
 import config
 import recognizer
+from speech_test import SpeechTest
 from state import State
 from pvrecorder import PvRecorder
 
@@ -18,7 +20,7 @@ app = customtkinter.CTk()
 app.title("my app")
 app.geometry("720x360")
 app.minsize(720, 360)
-state = State(words=[], word_index=-1, audio_input_index=0)
+state = State(words=[], word_index=-1, audio_input_index=0, speech_test=SpeechTest(), filename='')
 rec = recognizer.Recognizer(0, lambda x: x, lambda: print(), 1.0)
 
 # instantiate all components
@@ -56,21 +58,32 @@ def load_words():
         if words:
             global state
             state.words = words
+            state.filename = re.sub('(^.*[/\\\\])|(\\..{1,3}$)', '', filename)
+
+
+def end_test(finished):
+    word_to_pronounce_label.configure(require_redraw=True, text='')
+    global rec
+    rec.stop()
+    if finished:
+        state.speech_test.save('{0}{1}-{2}.csv'.format(config.get(config.RESULT_SAVE_DIR),
+                                                       state.filename,
+                                                       datetime.now().strftime('%Y%m%d%H%M%S')))
+    print('done')
 
 
 def check_word(recognized):
-    result = recognized.word \
-        if recognized.confidence > config.get(config.THRESHOLD_UNK) \
-        else '<UNK> ({0})'.format(recognized.word)
-    console_output.insert(END, result + '\n')
+    recognized.expected = state.words[state.word_index]
+    if recognized.confidence < config.get(config.THRESHOLD_UNK):
+        recognized.word = '<UNK>'
+    console_output.insert(END, str(recognized) + '\n')
+    state.speech_test.add(recognized)
     print(recognized)
     state.word_index = state.word_index + 1
     if state.word_index < len(state.words):
         word_to_pronounce_label.configure(require_redraw=True, text=state.words[state.word_index])
     else:
-        word_to_pronounce_label.configure(require_redraw=True, text='')
-        global rec
-        rec.stop()
+        end_test(finished=True)
 
 
 def start_test():
