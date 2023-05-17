@@ -28,8 +28,9 @@ audio_input_combobox = customtkinter.CTkComboBox(app, values=PvRecorder.get_audi
 theme_button = customtkinter.CTkButton(app, text="Tema")
 open_button = customtkinter.CTkButton(app, text="Otvori")
 start_button = customtkinter.CTkButton(app, text="Zapocni")
+retry_word_button = customtkinter.CTkButton(app, text="Ponisti zadnje")
 word_to_pronounce_label = customtkinter.CTkLabel(app, text='', font=('Arial', 36))
-console_output = customtkinter.CTkTextbox(app)
+console_output = customtkinter.CTkTextbox(app, width=400)
 console_output.bind("<Key>", lambda e: "break")
 
 # define ui grid
@@ -41,6 +42,7 @@ audio_input_combobox.grid(row=0, column=0, pady=5)
 theme_button.grid(row=1, column=0, pady=5)
 open_button.grid(row=2, column=0, pady=5)
 start_button.grid(row=3, column=0, pady=5)
+retry_word_button.grid(row=4, column=0, pady=5)
 word_to_pronounce_label.grid(row=0, column=1, pady=30)
 console_output.grid(row=1, column=1, rowspan=4)
 
@@ -59,6 +61,15 @@ def load_words():
             global state
             state.words = words
             state.filename = re.sub('(^.*[/\\\\])|(\\..{1,3}$)', '', filename)
+
+
+def retry_word():
+    if state.word_index < 1 or state.word_index == len(state.words):
+        return
+    state.word_index = state.word_index - 1
+    word_to_pronounce_label.configure(require_redraw=True, text=state.words[state.word_index])
+    ignored = state.speech_test.pop()
+    console_output.insert(END, '[X]' + str(ignored) + '\n')
 
 
 def end_test(finished):
@@ -110,5 +121,6 @@ audio_input_combobox.configure(command=change_audio_input)
 theme_button.configure(command=toggle_theme)
 open_button.configure(command=load_words)
 start_button.configure(command=start_test)
+retry_word_button.configure(command=retry_word)
 
 app.mainloop()

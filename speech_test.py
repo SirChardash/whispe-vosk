@@ -6,6 +6,9 @@ class SpeechTest:
     def add(self, utterance):
         self.utterances.append(utterance)
 
+    def pop(self):
+        return self.utterances.pop()
+
     def save(self, path):
         file = open(path, 'w')
         for utterance in self.utterances:
