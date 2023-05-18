@@ -22,7 +22,7 @@ app.title("my app")
 app.geometry("720x480")
 app.minsize(720, 360)
 state = State(words=[], word_index=-1, audio_input_index=0, speech_test=SpeechTest(), filename='')
-rec = recognizer.Recognizer(0, lambda x: x, lambda: print(), 1.0)
+rec = recognizer.Recognizer(0, lambda x: x, lambda: print(), 1.0, False)
 
 # instantiate all components
 audio_input_combobox = customtkinter.CTkComboBox(app, values=PvRecorder.get_audio_devices())
@@ -32,6 +32,7 @@ start_button = customtkinter.CTkButton(app, text="Zapocni")
 retry_word_button = customtkinter.CTkButton(app, text="Ponisti zadnje")
 stop_test_button = customtkinter.CTkButton(app, text="Prekini")
 shuffle_words_checkbox = customtkinter.CTkCheckBox(app, text="Nasumican poredak")
+save_recording_checkbox = customtkinter.CTkCheckBox(app, text="Sacuvaj audio")
 word_to_pronounce_label = customtkinter.CTkLabel(app, text='', font=('Arial', 36))
 console_output = customtkinter.CTkTextbox(app, width=400)
 console_output.bind("<Key>", lambda e: "break")
@@ -48,6 +49,7 @@ start_button.grid(row=3, column=0, pady=5)
 retry_word_button.grid(row=4, column=0, pady=5)
 stop_test_button.grid(row=5, column=0, pady=5)
 shuffle_words_checkbox.grid(row=6, column=0, pady=5)
+save_recording_checkbox.grid(row=7, column=0, pady=5)
 word_to_pronounce_label.grid(row=0, column=1, pady=30)
 console_output.grid(row=1, column=1, rowspan=4)
 
@@ -82,9 +84,12 @@ def end_test(finished):
     global rec
     rec.stop()
     if finished:
-        state.speech_test.save('{0}{1}-{2}.csv'.format(config.get(config.RESULT_SAVE_DIR),
-                                                       state.filename,
-                                                       datetime.now().strftime('%Y%m%d%H%M%S')))
+        save_file = '{0}{1}-{2}'.format(config.get(config.RESULT_SAVE_DIR),
+                                        state.filename,
+                                        datetime.now().strftime('%Y%m%d%H%M%S'))
+        state.speech_test.save('{0}.csv'.format(save_file))
+        if save_recording_checkbox.get():
+            rec.save_last_recording('{0}.wav'.format(save_file))
     state.speech_test = SpeechTest()
     print('done')
 
@@ -114,7 +119,8 @@ def start_test():
     word_to_pronounce_label.configure(require_redraw=True, text=state.words[state.word_index])
     rec = recognizer.Recognizer(audio_input_index=state.audio_input_index, on_recognize=check_word,
                                 on_ready=lambda: print('heh'),
-                                threshold_ignore=config.get(config.THRESHOLD_IGNORE))
+                                threshold_ignore=config.get(config.THRESHOLD_IGNORE),
+                                save_recording=save_recording_checkbox.get())
     Thread(target=rec.start).start()
     console_output.delete('1.0', END)
 
