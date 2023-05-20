@@ -14,13 +14,12 @@ from speech_test import SpeechTest
 from state import State
 from pvrecorder import PvRecorder
 
-# get config and apply initial settings
 config.initialize()
-customtkinter.set_appearance_mode(config.get(config.THEME))
 
 # set global settings
+customtkinter.set_appearance_mode(config.get(config.THEME))
 app = customtkinter.CTk()
-app.title('my app')
+app.title('Vosk Recorder')
 app.geometry('720x520')
 app.minsize(720, 360)
 state = State(words=[], word_index=-1, audio_input_index=0, speech_test=SpeechTest(), filename='')
@@ -34,7 +33,7 @@ retry_word_button = customtkinter.CTkButton(app, text='Ponisti zadnje', state=cu
 stop_test_button = customtkinter.CTkButton(app, text='Prekini', state=customtkinter.DISABLED)
 word_to_pronounce_label = customtkinter.CTkLabel(app, text='', font=('Arial', 36))
 test_audio_file_button = customtkinter.CTkButton(app, text='Test preko fajla')
-console_output = customtkinter.CTkTextbox(app, width=400)
+console_output = customtkinter.CTkTextbox(app)
 console_output.bind('<Key>', lambda e: 'break')
 
 # define ui grid
@@ -49,7 +48,7 @@ retry_word_button.grid(row=4, column=0, pady=5)
 stop_test_button.grid(row=5, column=0, pady=5)
 test_audio_file_button.grid(row=8, column=0, pady=5)
 word_to_pronounce_label.grid(row=0, column=1, pady=30)
-console_output.grid(row=1, column=1, rowspan=4)
+console_output.grid(row=1, column=1, rowspan=4, sticky='ew')
 
 
 def set_ui_state(in_test):

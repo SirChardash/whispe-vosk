@@ -10,6 +10,7 @@ SAVE_RECORDING = 'save_recording'
 SHUFFLE_WORDS = 'shuffle_words'
 MODEL_PATH = 'model_path'
 AUDIO_INPUT = 'audio_input'
+RESULT_FORMAT = 'result_format'
 
 config = dict()
 
@@ -22,6 +23,7 @@ config_default = {
     SHUFFLE_WORDS: 0,
     MODEL_PATH: 'model',
     AUDIO_INPUT: '',
+    RESULT_FORMAT: '{detected},{expected},{confidence}'
 }
 
 
