@@ -40,6 +40,11 @@ test_audio_file_button = customtkinter.CTkButton(app, text="Test preko fajla")
 console_output = customtkinter.CTkTextbox(app, width=400)
 console_output.bind("<Key>", lambda e: "break")
 
+if config.get(config.SHUFFLE_WORDS):
+    shuffle_words_checkbox.select()
+if config.get(config.SAVE_RECORDING):
+    save_recording_checkbox.select()
+
 # define ui grid
 app.grid_columnconfigure(0, weight=1)
 app.grid_columnconfigure(1, weight=5)
@@ -187,6 +192,8 @@ start_button.configure(command=start_test)
 retry_word_button.configure(command=retry_word)
 stop_test_button.configure(command=lambda: end_test(finished=False))
 test_audio_file_button.configure(command=test_audio_file)
+shuffle_words_checkbox.configure(command=lambda: config.put(config.SHUFFLE_WORDS, shuffle_words_checkbox.get()))
+save_recording_checkbox.configure(command=lambda: config.put(config.SAVE_RECORDING, save_recording_checkbox.get()))
 
 Thread(daemon=True, target=refresh_audio_input_devices).start()
 
