@@ -2,6 +2,7 @@ import wave
 from datetime import datetime
 import random
 from threading import Thread
+from time import sleep
 from tkinter import filedialog, END
 import re
 
@@ -166,6 +167,18 @@ def test_audio_file():
     console_output.delete('1.0', END)
 
 
+def refresh_audio_input_devices():
+    while True:
+        devices = PvRecorder.get_audio_devices()
+        if audio_input_combobox.cget('values') != devices:
+            audio_input_combobox.configure(values=devices)
+            if audio_input_combobox.get() not in devices:
+                new_device = devices[0] if devices else None
+                audio_input_combobox.set(new_device)
+                change_audio_input(new_device)
+        sleep(3)
+
+
 # assign commands to ui components
 audio_input_combobox.configure(command=change_audio_input)
 theme_button.configure(command=toggle_theme)
@@ -174,5 +187,7 @@ start_button.configure(command=start_test)
 retry_word_button.configure(command=retry_word)
 stop_test_button.configure(command=lambda: end_test(finished=False))
 test_audio_file_button.configure(command=test_audio_file)
+
+Thread(daemon=True, target=refresh_audio_input_devices).start()
 
 app.mainloop()
