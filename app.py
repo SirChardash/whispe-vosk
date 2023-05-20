@@ -1,3 +1,4 @@
+import wave
 from datetime import datetime
 import random
 from threading import Thread
@@ -34,6 +35,7 @@ stop_test_button = customtkinter.CTkButton(app, text="Prekini")
 shuffle_words_checkbox = customtkinter.CTkCheckBox(app, text="Nasumican poredak")
 save_recording_checkbox = customtkinter.CTkCheckBox(app, text="Sacuvaj audio")
 word_to_pronounce_label = customtkinter.CTkLabel(app, text='', font=('Arial', 36))
+test_audio_file_button = customtkinter.CTkButton(app, text="Test preko fajla")
 console_output = customtkinter.CTkTextbox(app, width=400)
 console_output.bind("<Key>", lambda e: "break")
 
@@ -50,6 +52,7 @@ retry_word_button.grid(row=4, column=0, pady=5)
 stop_test_button.grid(row=5, column=0, pady=5)
 shuffle_words_checkbox.grid(row=6, column=0, pady=5)
 save_recording_checkbox.grid(row=7, column=0, pady=5)
+test_audio_file_button.grid(row=8, column=0, pady=5)
 word_to_pronounce_label.grid(row=0, column=1, pady=30)
 console_output.grid(row=1, column=1, rowspan=4)
 
@@ -88,14 +91,14 @@ def end_test(finished):
                                         state.filename,
                                         datetime.now().strftime('%Y%m%d%H%M%S'))
         state.speech_test.save('{0}.csv'.format(save_file))
-        if save_recording_checkbox.get():
+        if save_recording_checkbox.get() and not rec.audio_stream:
             rec.save_last_recording('{0}.wav'.format(save_file))
     state.speech_test = SpeechTest()
     print('done')
 
 
 def check_word(recognized):
-    recognized.expected = state.words[state.word_index]
+    recognized.expected = state.words[state.word_index] if state.word_index < len(state.words) else ''
     if recognized.confidence < config.get(config.THRESHOLD_UNK):
         recognized.word = '<UNK>'
     console_output.insert(END, str(recognized) + '\n')
@@ -117,7 +120,8 @@ def start_test():
         random.shuffle(state.words)
     state.word_index = 0
     word_to_pronounce_label.configure(require_redraw=True, text=state.words[state.word_index])
-    rec = recognizer.Recognizer(audio_input_index=state.audio_input_index, on_recognize=check_word,
+    rec = recognizer.Recognizer(audio_input_index=state.audio_input_index,
+                                on_recognize=check_word,
                                 on_ready=lambda: print('heh'),
                                 threshold_ignore=config.get(config.THRESHOLD_IGNORE),
                                 save_recording=save_recording_checkbox.get())
@@ -130,6 +134,23 @@ def toggle_theme():
     customtkinter.set_appearance_mode(config.get(config.THEME))
 
 
+def test_audio_file():
+    filename = filedialog.askopenfilename()
+    if not filename or not state.words:
+        return
+    global rec
+    rec.stop()
+    state.word_index = 0
+    word_to_pronounce_label.configure(require_redraw=True, text=state.words[state.word_index])
+    rec = recognizer.Recognizer(on_recognize=check_word,
+                                on_ready=lambda: print('heh'),
+                                threshold_ignore=config.get(config.THRESHOLD_IGNORE),
+                                save_recording=0,
+                                audio_stream=wave.open(filename))
+    Thread(target=rec.start).start()
+    console_output.delete('1.0', END)
+
+
 # assign commands to ui components
 audio_input_combobox.configure(command=change_audio_input)
 theme_button.configure(command=toggle_theme)
@@ -137,5 +158,6 @@ open_button.configure(command=load_words)
 start_button.configure(command=start_test)
 retry_word_button.configure(command=retry_word)
 stop_test_button.configure(command=lambda: end_test(finished=False))
+test_audio_file_button.configure(command=test_audio_file)
 
 app.mainloop()
