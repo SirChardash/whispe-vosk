@@ -8,6 +8,7 @@ THRESHOLD_IGNORE = 'threshold_ignore'
 RESULT_SAVE_DIR = 'result_save_dir'
 SAVE_RECORDING = 'save_recording'
 SHUFFLE_WORDS = 'shuffle_words'
+MODEL_PATH = 'model_path'
 
 config = dict()
 
@@ -17,7 +18,8 @@ config_default = {
     THRESHOLD_IGNORE: 0.8,
     RESULT_SAVE_DIR: '',
     SAVE_RECORDING: 0,
-    SHUFFLE_WORDS: 0
+    SHUFFLE_WORDS: 0,
+    MODEL_PATH: 'model'
 }
 
 

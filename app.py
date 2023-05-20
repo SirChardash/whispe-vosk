@@ -3,7 +3,7 @@ from datetime import datetime
 import random
 from threading import Thread
 from time import sleep
-from tkinter import filedialog, END
+from tkinter import filedialog, END, messagebox
 import re
 
 import customtkinter
@@ -21,7 +21,7 @@ customtkinter.set_appearance_mode(config.get(config.THEME))
 # set global settings
 app = customtkinter.CTk()
 app.title("my app")
-app.geometry("720x480")
+app.geometry("720x520")
 app.minsize(720, 360)
 state = State(words=[], word_index=-1, audio_input_index=0, speech_test=SpeechTest(), filename='')
 rec = recognizer.Recognizer(0, lambda x: x, lambda: print(), 1.0, False)
@@ -37,6 +37,7 @@ shuffle_words_checkbox = customtkinter.CTkCheckBox(app, text="Nasumican poredak"
 save_recording_checkbox = customtkinter.CTkCheckBox(app, text="Sacuvaj audio")
 word_to_pronounce_label = customtkinter.CTkLabel(app, text='', font=('Arial', 36))
 test_audio_file_button = customtkinter.CTkButton(app, text="Test preko fajla")
+load_model_button = customtkinter.CTkButton(app, text="Ucitaj model")
 console_output = customtkinter.CTkTextbox(app, width=400)
 console_output.bind("<Key>", lambda e: "break")
 
@@ -59,6 +60,7 @@ stop_test_button.grid(row=5, column=0, pady=5)
 shuffle_words_checkbox.grid(row=6, column=0, pady=5)
 save_recording_checkbox.grid(row=7, column=0, pady=5)
 test_audio_file_button.grid(row=8, column=0, pady=5)
+load_model_button.grid(row=9, column=0, pady=5)
 word_to_pronounce_label.grid(row=0, column=1, pady=30)
 console_output.grid(row=1, column=1, rowspan=4)
 
@@ -73,7 +75,8 @@ def set_ui_state(in_test):
     stop_test_button.configure(require_redraw=True, state=test_component_state)
     shuffle_words_checkbox.configure(require_redraw=True, state=config_component_state)
     test_audio_file_button.configure(require_redraw=True, state=config_component_state)
-    test_audio_file_button.configure(require_redraw=True, state=config_component_state)
+    save_recording_checkbox.configure(require_redraw=True, state=config_component_state)
+    load_model_button.configure(require_redraw=True, state=config_component_state)
 
 
 def change_audio_input(selected):
@@ -143,9 +146,10 @@ def start_test():
     rec = recognizer.Recognizer(audio_input_index=state.audio_input_index,
                                 on_recognize=check_word,
                                 on_ready=lambda: print('heh'),
+                                model_path=config.get(config.MODEL_PATH),
                                 threshold_ignore=config.get(config.THRESHOLD_IGNORE),
                                 save_recording=save_recording_checkbox.get())
-    Thread(target=rec.start).start()
+    Thread(daemon=True, target=rec.start).start()
     console_output.delete('1.0', END)
     set_ui_state(in_test=True)
 
@@ -166,6 +170,7 @@ def test_audio_file():
     rec = recognizer.Recognizer(on_recognize=check_word,
                                 on_ready=lambda: print('heh'),
                                 threshold_ignore=config.get(config.THRESHOLD_IGNORE),
+                                model_path=config.get(config.MODEL_PATH),
                                 save_recording=0,
                                 audio_stream=wave.open(filename))
     Thread(target=rec.start).start()
@@ -184,6 +189,16 @@ def refresh_audio_input_devices():
         sleep(3)
 
 
+def set_model_path():
+    model_dir = filedialog.askdirectory()
+    if model_dir:
+        try:
+            recognizer.get_recognizer(model_dir)
+            config.put(config.MODEL_PATH, model_dir)
+        except:
+            messagebox.showerror('Greska', 'Odabrani direktorij ne sadrzi model!')
+
+
 # assign commands to ui components
 audio_input_combobox.configure(command=change_audio_input)
 theme_button.configure(command=toggle_theme)
@@ -194,6 +209,7 @@ stop_test_button.configure(command=lambda: end_test(finished=False))
 test_audio_file_button.configure(command=test_audio_file)
 shuffle_words_checkbox.configure(command=lambda: config.put(config.SHUFFLE_WORDS, shuffle_words_checkbox.get()))
 save_recording_checkbox.configure(command=lambda: config.put(config.SAVE_RECORDING, save_recording_checkbox.get()))
+load_model_button.configure(command=set_model_path)
 
 Thread(daemon=True, target=refresh_audio_input_devices).start()
 

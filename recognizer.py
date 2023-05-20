@@ -32,13 +32,14 @@ def get_result(final_result):
 
 class Recognizer:
 
-    def __init__(self, on_recognize, on_ready, threshold_ignore, save_recording, audio_input_index=None,
+    def __init__(self, on_recognize, on_ready, threshold_ignore, save_recording, model_path, audio_input_index=None,
                  audio_stream=None):
         self.on_recognize = on_recognize
         self.on_ready = on_ready
         self.threshold_ignore = threshold_ignore
         self.should_run = False
         self.save_recording = save_recording
+        self.model_path = model_path
         self.audio_input_index = audio_input_index
         self.audio_stream = audio_stream
         self.recording = []
@@ -46,7 +47,7 @@ class Recognizer:
     def start(self):
         self.recording = []
         self.should_run = True
-        recognizer = get_recognizer('model')
+        recognizer = get_recognizer(self.model_path)
 
         recorder = None
         if not self.audio_stream:
