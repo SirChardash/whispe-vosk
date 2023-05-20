@@ -30,8 +30,8 @@ audio_input_combobox = customtkinter.CTkComboBox(app, values=PvRecorder.get_audi
 theme_button = customtkinter.CTkButton(app, text="Tema")
 open_button = customtkinter.CTkButton(app, text="Otvori")
 start_button = customtkinter.CTkButton(app, text="Zapocni")
-retry_word_button = customtkinter.CTkButton(app, text="Ponisti zadnje")
-stop_test_button = customtkinter.CTkButton(app, text="Prekini")
+retry_word_button = customtkinter.CTkButton(app, text="Ponisti zadnje", state=customtkinter.DISABLED)
+stop_test_button = customtkinter.CTkButton(app, text="Prekini", state=customtkinter.DISABLED)
 shuffle_words_checkbox = customtkinter.CTkCheckBox(app, text="Nasumican poredak")
 save_recording_checkbox = customtkinter.CTkCheckBox(app, text="Sacuvaj audio")
 word_to_pronounce_label = customtkinter.CTkLabel(app, text='', font=('Arial', 36))
@@ -55,6 +55,19 @@ save_recording_checkbox.grid(row=7, column=0, pady=5)
 test_audio_file_button.grid(row=8, column=0, pady=5)
 word_to_pronounce_label.grid(row=0, column=1, pady=30)
 console_output.grid(row=1, column=1, rowspan=4)
+
+
+def set_ui_state(in_test):
+    test_component_state = customtkinter.NORMAL if in_test else customtkinter.DISABLED
+    config_component_state = customtkinter.DISABLED if in_test else customtkinter.NORMAL
+    audio_input_combobox.configure(require_redraw=True, state=config_component_state)
+    open_button.configure(require_redraw=True, state=config_component_state)
+    start_button.configure(require_redraw=True, state=config_component_state)
+    retry_word_button.configure(require_redraw=True, state=test_component_state)
+    stop_test_button.configure(require_redraw=True, state=test_component_state)
+    shuffle_words_checkbox.configure(require_redraw=True, state=config_component_state)
+    test_audio_file_button.configure(require_redraw=True, state=config_component_state)
+    test_audio_file_button.configure(require_redraw=True, state=config_component_state)
 
 
 def change_audio_input(selected):
@@ -95,6 +108,7 @@ def end_test(finished):
             rec.save_last_recording('{0}.wav'.format(save_file))
     state.speech_test = SpeechTest()
     print('done')
+    set_ui_state(in_test=False)
 
 
 def check_word(recognized):
@@ -127,6 +141,7 @@ def start_test():
                                 save_recording=save_recording_checkbox.get())
     Thread(target=rec.start).start()
     console_output.delete('1.0', END)
+    set_ui_state(in_test=True)
 
 
 def toggle_theme():
