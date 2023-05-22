@@ -1,6 +1,6 @@
 from threading import Thread
 from time import sleep
-from tkinter import filedialog, messagebox, StringVar, DoubleVar
+from tkinter import filedialog, messagebox, StringVar
 
 import customtkinter
 from pvrecorder import PvRecorder
@@ -148,11 +148,10 @@ class SettingsDialog(customtkinter.CTkInputDialog):
         Thread(daemon=True, target=self._refresh_audio_input_devices).start()
 
     def _ok_event(self, event=None):
-        try:
-            recognizer.get_recognizer(self._model_dir.get())
-        except:
+        if not recognizer.test_model(self._model_dir.get()):
             messagebox.showerror('Greška', 'Odabrani direktorij ne sadrži model!')
             return
+
         config.put(config.AUDIO_INPUT, self._audio_input_combobox.get())
         config.put(config.MODEL_PATH, self._model_dir.get())
         config.put(config.RESULT_SAVE_DIR, self._result_dir.get())

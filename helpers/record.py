@@ -3,7 +3,6 @@ import struct
 from pvrecorder import PvRecorder
 
 import util
-import vosk
 
 for index, device in enumerate(PvRecorder.get_audio_devices()):
     print(f"[{index}] {device}")
@@ -11,7 +10,7 @@ for index, device in enumerate(PvRecorder.get_audio_devices()):
 device_index = int(input('Select input: '))
 
 recorder = PvRecorder(device_index=device_index, frame_length=512, buffer_size_msec=2000)
-recognizer = util.get_recognizer('C:/git/whispe-vosk/model')
+recognizer = recorder.get_recognizer('C:/git/whispe-vosk/model')
 
 try:
     recorder.start()

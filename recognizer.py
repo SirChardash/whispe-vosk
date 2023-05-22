@@ -5,7 +5,17 @@ import wave
 import vosk
 from pvrecorder import PvRecorder
 
-from utterance import Utterance
+
+class Utterance:
+
+    def __init__(self, expected, word, confidence, full_text):
+        self.expected = expected
+        self.word = word
+        self.confidence = confidence
+        self.full_text = full_text
+
+    def __str__(self):
+        return '({0}, {1}, {2})'.format(self.word, self.confidence, self.full_text)
 
 
 def get_recognizer(path):
@@ -14,6 +24,14 @@ def get_recognizer(path):
     recognizer.SetPartialWords(1)
 
     return recognizer
+
+
+def test_model(path):
+    try:
+        get_recognizer(path)
+        return True
+    except:
+        return False
 
 
 def get_result(final_result):
