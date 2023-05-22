@@ -50,7 +50,7 @@ class SettingsDialog(customtkinter.CTkInputDialog):
         self._model_dir_label = customtkinter.CTkLabel(self, text='Model')
         self._model_dir = StringVar(value=config.get(config.MODEL_PATH))
         self._model_dir_value = customtkinter.CTkEntry(self, textvariable=self._model_dir)
-        self._model_dir_browse = customtkinter.CTkButton(self, width=28, text='📂',
+        self._model_dir_browse = customtkinter.CTkButton(self, width=28, text='...',
                                                          command=lambda: self._set_dir(self._model_dir))
         self.rowconfigure(row, weight=1)
         self._model_dir_label.grid(row=row, column=0, columnspan=1, padx=(edge, mid), pady=pad_y, sticky='w')
@@ -61,7 +61,7 @@ class SettingsDialog(customtkinter.CTkInputDialog):
         self._result_dir_label = customtkinter.CTkLabel(self, text='Čuvaj rezultate u')
         self._result_dir = StringVar(value=config.get(config.RESULT_SAVE_DIR))
         self._result_dir_value = customtkinter.CTkEntry(self, textvariable=self._result_dir)
-        self._result_dir_browse = customtkinter.CTkButton(self, width=28, text='📂',
+        self._result_dir_browse = customtkinter.CTkButton(self, width=28, text='...',
                                                           command=lambda: self._set_dir(self._result_dir))
         self.rowconfigure(row, weight=1)
         self._result_dir_label.grid(row=row, column=0, columnspan=1, padx=(edge, mid), pady=pad_y, sticky='w')
