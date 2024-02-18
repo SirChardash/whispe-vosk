@@ -115,7 +115,10 @@ def check_word(recognized):
     recognized.expected = state.words[state.word_index] if state.word_index < len(state.words) else ''
     if recognized.confidence < config.get(config.THRESHOLD_UNK):
         recognized.word = '<UNK>'
-    console_log(str(recognized))
+    console_log(config.get(config.RESULT_FORMAT).format(detected=recognized.word,
+                                                        expected=recognized.expected,
+                                                        confidence=recognized.confidence)
+                + ' [' + recognized.full_text + ']')
     state.speech_test.add(recognized)
     print(recognized)
     state.word_index = state.word_index + 1
